@@ -1,20 +1,80 @@
 
 
-const readLine = require('readline').createInterface({
-    input: process.stdin,
-    output: process.stdout
+
+const rlp = require('readline');
+
+const rl = rlp.createInterface({
+  input: process.stdin,
+  output: process.stdout
 });
 
-function getUserInput(userPrompt){
-    readLine.question(userPrompt + "\n", (userInput) => {
-        return userInput;
-    });
+function ask(prompt) {
+  return new Promise(resolve => {
+    rl.question(prompt, input => resolve(input));
+  });
+}
+
+ask("Enter your name: ")
+  .then(result => { 
+
+    console.log(result + " Welcome to BlackJack!")
+
+    const gambler = new Gambler(result);
+    const deck = new CardsDeck();
+
+    deck.createNewDeck();
+    // deck.randomizeDeck();
+
+    // gambler.drawCard(deck.getCards());
+    
+    // console.log(gambler.currentHand);
+
+
+
+
+    ; return ask("Second question"); })
+  .then(result => { console.log(result); return ask(); })
+  .then(result => { console.log(result); rl.close() });
+
+
+
+
+//GAMBLER CLASS
+class Gambler {
+    constructor(name){
+        this.name = name;
+        this.price = 0;
+        this.currentHand = [];
+    }
+
+    getName(){
+        return this.name;
+    }
+
+    drawCard(cardsDeck){
+        this.currentHand.push(cardsDeck.pop());
+    }
 }
 
 
+    
 
 
+//GAME CLASS
+class Game {
+    constructor(){
+        let roundPrice = 1000;
+        this.round = 1;
+    }
 
+    advanceRound(){
+        this.round++;
+    }
+
+}
+
+
+//CARD CLASS
 class Card {
     constructor(value, suit){
         this.value = value;
@@ -24,46 +84,94 @@ class Card {
 }
 
 
+
+//CARDSDECK CLASS
 class CardsDeck{
     constructor(){
         this.cards = [];
     }
 
+    getCards(){
+        return this.cards;
+    }
 
     createNewDeck(){
         const values = ["A","2","3","4","5","6", "7", "8", "9", "10", "J", "Q", "K"];
         const suits = ["S","H","C","D"];
-    
-    
+
+        let temporalDeck = [];
+
         for(let i = 0; i < values.length; i++){
             for(let j = 0; j < suits.length; j++){
-                let card = new Card(values[i] + "-" + suits[j]);
-                this.cards.push(card)
+                temporalDeck.push(values[i] + "-" + suits[j])
             }
         }
+
+
+        this.randomizeDeck(temporalDeck);
     
     }
 
-    randomizeDeck(){
-        for(let i = 0; i < this.cards.length; i++){
-            let j = Math.floor(Math.random() * this.cards.length);
-            let temporal = this.cards[i];
-            this.cards[i] = this.cards[j];
-            this.cards[j] = temporal;
+
+
+
+    randomizeDeck(temporalDeck){
+
+
+        for(let i = 0; i < temporalDeck.length; i++){
+            let j = Math.floor(Math.random() * temporalDeck.length);
+            let temporal = temporalDeck[i];
+            temporalDeck[i] = temporalDeck[j];
+            temporalDeck[j] = temporal;
         }
+
+        for(let i = 0; i < temporalDeck.length; i++){
+            let split = temporalDeck[i].split("-");
+            let first = split[0];
+            let second = split[1];
+            this.cards.push(new Card(first,second));
+        }
+
+        
     }
+    
 
 }
 
 
 
-let deck1 = new CardsDeck();
-deck1.createNewDeck();
 
-console.log(deck1.cards);
-console.log("Half");
-deck1.randomizeDeck();
-console.log(deck1.cards);
+
+
+
+
+// let deck1 = new CardsDeck();
+// deck1.createNewDeck();
+// deck1.randomizeDeck();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
