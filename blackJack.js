@@ -14,25 +14,36 @@ function ask(prompt) {
   });
 }
 
+
 ask("Enter your name: ")
   .then(result => { 
 
     console.log(result + " Welcome to BlackJack!")
 
-    const gambler = new Gambler(result);
-    const deck = new CardsDeck();
     const game = new Game();
+    const gambler = new Gambler(result, game);
+    const deck = new CardsDeck();
+
     
     deck.createNewDeck();
     
 
+        do {
 
-    do {
+            gambler.drawCard(deck.getCards());
+    
+        
+        } while (gambler.getCurretScore() < 18)
 
-        gambler.drawCard(deck.getCards());
+
+
+
+
+        
+
+
 
     
-    } while (gambler.getCurretScore() < 18);
 
 
     // gambler.setCurrentScore();
@@ -54,14 +65,14 @@ ask("Enter your name: ")
 
 
 
-
 //GAMBLER CLASS
 class Gambler {
-    constructor(name){
+    constructor(name, currentGame){
         this.name = name;
         this.price = 0;
         this.currentHand = [];
         this.currentScore = 0;
+        this.currentGame = currentGame;
     }
 
     getName(){
@@ -83,11 +94,15 @@ class Gambler {
     drawCard(cardsDeck){
         this.currentHand.push(cardsDeck.pop());
         this.setCurrentScore();
+        this.showStatus();
+
+    }
+
+    showStatus(){
         console.log("Your current Hand")
         console.log(this.getCurrentHand());
         console.log("Your current Score");
         console.log(this.getCurretScore());
-
     }
 
 
@@ -100,29 +115,48 @@ class Gambler {
     setCurrentScore(){
 
 
-        console.log("Hello");
 
         if(this.getCurrentHand()[this.getCurrentHand().length-1].value  === "J" ||  
         this.getCurrentHand()[this.getCurrentHand().length-1].value  === "Q" || 
         this.getCurrentHand()[this.getCurrentHand().length-1].value  === "K") {
             this.currentScore += 10;
         } else if (this.getCurrentHand()[this.getCurrentHand().length-1].value  === "A"){
-            if(this.getCurretScore() + 11 <= 18){
-                ask(`Your current Score is ${this.getCurretScore()} What should A be worth Enter 1 or 11 :` )
-                    .then(result => { 
-                        if(result === 1){
-                            this.currentScore += 1;
-                        } else if(result === 11){
-                            this.currentScore += 11;
-                        }
-                    ; rl.close() });
+
+            let timesAPresent = 0;
+
+            for(let i = 0; i < this.getCurrentHand().length;i++){
+                if(this.getCurrentHand()[i].value === "A"){
+                    timesAPresent++;
                 }
+            }
+
+            console.log(`times present ${timesAPresent}`);
+
+            if(timesAPresent > 1){
+                this.currentScore += 1;
+            } else {
+                this.currentScore += 11;
+            }
+
+            // if(this.getCurretScore() + 11 <= 18){
+            //     ask(`Your current Score is ${this.getCurretScore()} What should A be worth Enter 1 or 11 :` )
+            //         .then(result => { 
+            //             if(result === 1){
+            //                 this.currentScore += 1;
+            //             } else if(result === 11){
+            //                 this.currentScore += 11;
+            //             }
+            //         ; rl.close() });
+            //     }
+
         } else {
             this.currentScore += parseInt(this.getCurrentHand()[this.getCurrentHand().length-1].value);
         }
 
-        if(this.getCurretScore() >= 18 && this.getCurretScore <= 21){
-            Game.advanceRound(this);
+        if(this.getCurretScore() >= 18 && this.getCurretScore() <= 21){
+            this.currentGame.advanceRound(this);
+            // this.showStatus();
+            console.log(`Congratulations You Won! Your current round is: ${this.currentGame.getRound()}`);
         }
 
     }
@@ -135,16 +169,21 @@ class Gambler {
 //GAME CLASS
 class Game {
     constructor(){
-        let roundPrice = 1000;
+        this.roundPrice = 1000;
         this.round = 1;
+    }
+
+    getRound(){
+        return this.round;
     }
 
     advanceRound(gambler){
         this.round++;
-        console.log("Congratulations! You advance round");
-        console.log(`Curren round: ${this.round}`)
+        // console.log("Congratulations! You advance round");
+        // console.log(`Curren round: ${this.round}`)
         
-        gambler.increasePrice(roundPrice);
+        gambler.increasePrice(this.roundPrice);
+
     }
 
 }
