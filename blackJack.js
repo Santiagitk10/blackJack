@@ -44,7 +44,14 @@ class CardsDeck{
     
     }
 
-    
+    randomizeDeck(){
+        for(let i = 0; i < this.cards.length; i++){
+            let j = Math.floor(Math.random() * this.cards.length);
+            let temporal = this.cards[i];
+            this.cards[i] = this.cards[j];
+            this.cards[j] = temporal;
+        }
+    }
 
 }
 
@@ -53,6 +60,9 @@ class CardsDeck{
 let deck1 = new CardsDeck();
 deck1.createNewDeck();
 
+console.log(deck1.cards);
+console.log("Half");
+deck1.randomizeDeck();
 console.log(deck1.cards);
 
 
