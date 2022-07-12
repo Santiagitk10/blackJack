@@ -1,169 +1,32 @@
 
-
-
-const rlp = require('readline');
-
-const rl = rlp.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-function ask(prompt) {
-  return new Promise(resolve => {
-    rl.question(prompt, input => resolve(input));
-  });
-}
-
-
-ask("Enter your name: ")
-  .then(result => { 
-
-    console.log(result + " Welcome to BlackJack!")
-
-    const game = new Game();
-    const gambler = new Gambler(result, game);
-    const deck = new CardsDeck();
-
-    
-    deck.createNewDeck();
-    
-
-        do {
-
-            gambler.drawCard(deck.getCards());
-    
-        
-        } while (gambler.getCurretScore() < 18)
+const prompt = require('prompt-sync')();
 
 
 
-
-
-        
-
-
-
-    
-
-
-    // gambler.setCurrentScore();
+// console.log("Hola " +  input);
 
 
 
-    // deck.randomizeDeck();
+//PREGUNTA SANTIAGO REQUIRE
+// const rlp = require('readline');
 
-    // gambler.drawCard(deck.getCards());
-    
-    // console.log(gambler.currentHand);
+// const rl = rlp.createInterface({
+//   input: process.stdin,
+//   output: process.stdout
+// });
 
+// function ask(prompt) {
+//   return new Promise(resolve => {
+//     rl.question(prompt, input => resolve(input));
+//   });
+// }
 
+// ask("Enter your name: ")
+//   .then(result => { 
+//     ; return ask("Second question"); })
+//   .then(result => { console.log(result); return ask(); })
+//   .then(result => { console.log(result); rl.close() });
 
-
-    ; return ask("Second question"); })
-  .then(result => { console.log(result); return ask(); })
-  .then(result => { console.log(result); rl.close() });
-
-
-
-//GAMBLER CLASS
-class Gambler {
-    constructor(name, currentGame){
-        this.name = name;
-        this.price = 0;
-        this.currentHand = [];
-        this.currentScore = 0;
-        this.currentGame = currentGame;
-    }
-
-    getName(){
-        return this.name;
-    }
-
-    getCurrentHand(){
-        return this.currentHand;
-    }
-
-    getCurretScore(){
-        return this.currentScore;
-    }
-
-    getPrice(){
-        return this.price;
-    }
-
-    drawCard(cardsDeck){
-        this.currentHand.push(cardsDeck.pop());
-        this.setCurrentScore();
-        this.showStatus();
-
-    }
-
-    showStatus(){
-        console.log("Your current Hand")
-        console.log(this.getCurrentHand());
-        console.log("Your current Score");
-        console.log(this.getCurretScore());
-    }
-
-
-    increasePrice(increase){
-        this.price += increase;
-        console.log(`Your current Price is: $${this.getPrice()}`);
-    }
-
-
-    setCurrentScore(){
-
-
-
-        if(this.getCurrentHand()[this.getCurrentHand().length-1].value  === "J" ||  
-        this.getCurrentHand()[this.getCurrentHand().length-1].value  === "Q" || 
-        this.getCurrentHand()[this.getCurrentHand().length-1].value  === "K") {
-            this.currentScore += 10;
-        } else if (this.getCurrentHand()[this.getCurrentHand().length-1].value  === "A"){
-
-            let timesAPresent = 0;
-
-            for(let i = 0; i < this.getCurrentHand().length;i++){
-                if(this.getCurrentHand()[i].value === "A"){
-                    timesAPresent++;
-                }
-            }
-
-            console.log(`times present ${timesAPresent}`);
-
-            if(timesAPresent > 1){
-                this.currentScore += 1;
-            } else {
-                this.currentScore += 11;
-            }
-
-            // if(this.getCurretScore() + 11 <= 18){
-            //     ask(`Your current Score is ${this.getCurretScore()} What should A be worth Enter 1 or 11 :` )
-            //         .then(result => { 
-            //             if(result === 1){
-            //                 this.currentScore += 1;
-            //             } else if(result === 11){
-            //                 this.currentScore += 11;
-            //             }
-            //         ; rl.close() });
-            //     }
-
-        } else {
-            this.currentScore += parseInt(this.getCurrentHand()[this.getCurrentHand().length-1].value);
-        }
-
-        if(this.getCurretScore() >= 18 && this.getCurretScore() <= 21){
-            this.currentGame.advanceRound(this);
-            // this.showStatus();
-            console.log(`Congratulations You Won! Your current round is: ${this.currentGame.getRound()}`);
-        }
-
-    }
-}
-
-
-    
 
 
 //GAME CLASS
@@ -187,6 +50,111 @@ class Game {
     }
 
 }
+
+
+//GAMBLER CLASS
+class Gambler {
+    constructor(name, currentGame){
+        this.name = name;
+        this.price = 0;
+        this.currentHand = [];
+        this.currentScore = 0;
+        this.currentGame = currentGame;
+    }
+
+    getName(){
+        return this.name;
+    }
+
+    getCurrentHand(){
+        return this.currentHand;
+    }
+
+    getCurrentScore(){
+        return this.currentScore;
+    }
+
+    getPrice(){
+        return this.price;
+    }
+
+    drawCard(cardsDeck){
+        this.currentHand.push(cardsDeck.pop());
+        this.setCurrentScore();
+        console.log("Your current Hand")
+        console.log(this.getCurrentHand());
+        console.log("Your current Score");
+        console.log(this.getCurrentScore());
+
+    }
+
+
+
+    increasePrice(increase){
+        this.price += increase;
+        console.log(`Your current Price is: $${this.getPrice()}`);
+    }
+
+
+    setCurrentScore(){
+
+        console.log(this.getCurrentHand()[this.getCurrentHand().length-1].value); //por eliminar
+
+        if(this.getCurrentHand()[this.getCurrentHand().length-1].value  === "J" ||  
+        this.getCurrentHand()[this.getCurrentHand().length-1].value  === "Q" || 
+        this.getCurrentHand()[this.getCurrentHand().length-1].value  === "K") {
+            this.currentScore += 10;
+        } else if (this.getCurrentHand()[this.getCurrentHand().length-1].value  === "A"){
+
+           
+
+
+            //TIMES PRESENT POR SI NO LE PREGUNTABA AL USUARIO
+            // let timesAPresent = 0;
+            // for(let i = 0; i < this.getCurrentHand().length;i++){
+            //     if(this.getCurrentHand()[i].value === "A"){
+            //         timesAPresent++;
+            //     }
+            // }
+
+            // console.log(`times present ${timesAPresent}`);
+
+            // if(timesAPresent > 1){
+            //     this.currentScore += 1;
+            // } else {
+            //     this.currentScore += 11;
+            // }
+
+            if(this.getCurrentScore() + 11 <= 18){
+                let chosenAValue = prompt("What should A be worth Enter 1 or 11 : ");
+                        if(parseInt(chosenAValue) === 1){
+                            this.currentScore += 1;
+                        } else if(parseInt(chosenAValue) === 11){
+                            this.currentScore += 11;
+                        }
+                        console.log(this.currentScore); //Por eliminar
+
+            } else {
+                this.currentScore +=1;
+            }
+
+        } else {
+            this.currentScore += parseInt(this.getCurrentHand()[this.getCurrentHand().length-1].value);
+        }
+
+        if(this.getCurrentScore() >= 18 && this.getCurrentScore() <= 21){
+            this.currentGame.advanceRound(this);
+            console.log(`Congratulations You Won! Your current round is: ${this.currentGame.getRound()}`);
+        }
+
+    }
+}
+
+
+    
+
+
+
 
 
 //CARD CLASS
@@ -253,18 +221,58 @@ class CardsDeck{
 }
 
 
+//GAME INITIALIZATION
+const game = new Game();
+console.log("Welcome To BlackJack!")
+let name = prompt("Enter your name: ")
+const gambler = new Gambler(name, game);
+const deck = new CardsDeck();
+deck.createNewDeck();
+
+let isGameOn = true;
+
+do {
+
+    gambler.drawCard(deck.getCards());
+
+
+
+    if(gambler.getCurrentScore() >= 18){
+        isGameOn = false;
+    }
+
+
+} while (isGameOn);
 
 
 
 
 
 
-// ask("Enter your name: ")
-//   .then(result => { 
 
-//     ; return ask("Second question"); })
-//   .then(result => { console.log(result); return ask(); })
-//   .then(result => { console.log(result); rl.close() });
+
+
+        
+
+
+    // gambler.setCurrentScore();
+
+    // deck.randomizeDeck();
+
+    // gambler.drawCard(deck.getCards());
+    
+    // console.log(gambler.currentHand);
+
+
+
+
+
+
+
+
+
+
+
 
 
 
