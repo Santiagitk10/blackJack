@@ -3,10 +3,6 @@ const prompt = require('prompt-sync')();
 
 
 
-// console.log("Hola " +  input);
-
-
-
 //PREGUNTA SANTIAGO REQUIRE
 // const rlp = require('readline');
 
@@ -31,6 +27,7 @@ const prompt = require('prompt-sync')();
 
 //GAME CLASS
 class Game {
+
     constructor(){
         this.roundPrice = 1000;
         this.round = 1;
@@ -42,11 +39,12 @@ class Game {
 
     advanceRound(gambler){
         this.round++;
-        // console.log("Congratulations! You advance round");
-        // console.log(`Curren round: ${this.round}`)
-        
         gambler.increasePrice(this.roundPrice);
+    }
 
+    resetGame(gambler){
+        this.round = 1;
+        gambler.decreasePrice();
     }
 
 }
@@ -60,6 +58,7 @@ class Gambler {
         this.currentHand = [];
         this.currentScore = 0;
         this.currentGame = currentGame;
+        this.status = "Active";
     }
 
     getName(){
@@ -89,41 +88,23 @@ class Gambler {
     }
 
 
-
     increasePrice(increase){
         this.price += increase;
         console.log(`Your current Price is: $${this.getPrice()}`);
     }
 
+    decreasePrice(){
+        this.price = 0;
+        console.log(`Your current Price is: $${this.getPrice()}`);
+    }
 
     setCurrentScore(){
-
-        console.log(this.getCurrentHand()[this.getCurrentHand().length-1].value); //por eliminar
 
         if(this.getCurrentHand()[this.getCurrentHand().length-1].value  === "J" ||  
         this.getCurrentHand()[this.getCurrentHand().length-1].value  === "Q" || 
         this.getCurrentHand()[this.getCurrentHand().length-1].value  === "K") {
             this.currentScore += 10;
         } else if (this.getCurrentHand()[this.getCurrentHand().length-1].value  === "A"){
-
-           
-
-
-            //TIMES PRESENT POR SI NO LE PREGUNTABA AL USUARIO
-            // let timesAPresent = 0;
-            // for(let i = 0; i < this.getCurrentHand().length;i++){
-            //     if(this.getCurrentHand()[i].value === "A"){
-            //         timesAPresent++;
-            //     }
-            // }
-
-            // console.log(`times present ${timesAPresent}`);
-
-            // if(timesAPresent > 1){
-            //     this.currentScore += 1;
-            // } else {
-            //     this.currentScore += 11;
-            // }
 
             if(this.getCurrentScore() + 11 <= 18){
                 let chosenAValue = prompt("What should A be worth Enter 1 or 11 : ");
@@ -132,7 +113,6 @@ class Gambler {
                         } else if(parseInt(chosenAValue) === 11){
                             this.currentScore += 11;
                         }
-                        console.log(this.currentScore); //Por eliminar
 
             } else {
                 this.currentScore +=1;
@@ -144,14 +124,17 @@ class Gambler {
 
         if(this.getCurrentScore() >= 18 && this.getCurrentScore() <= 21){
             this.currentGame.advanceRound(this);
-            console.log(`Congratulations You Won! Your current round is: ${this.currentGame.getRound()}`);
+            console.log(`That´s Because You Rule ${this.getName()}!  Your current round is: ${this.currentGame.getRound()}`);
+            this.status = "Won";
+            // this.currentScore = 0;
+        } else if(this.getCurrentScore() > 21){
+            this.currentGame.resetGame(this);
+            console.log(`That Because You Lost :( Your current round is: ${this.currentGame.getRound()}`);
+            this.status = "Lost";
         }
 
     }
 }
-
-
-    
 
 
 
@@ -164,6 +147,8 @@ class Card {
         this.suit = suit;
     }
 }
+
+
 
 
 
@@ -189,16 +174,11 @@ class CardsDeck{
             }
         }
 
-
         this.randomizeDeck(temporalDeck);
     
     }
 
-
-
-
     randomizeDeck(temporalDeck){
-
 
         for(let i = 0; i < temporalDeck.length; i++){
             let j = Math.floor(Math.random() * temporalDeck.length);
@@ -213,11 +193,9 @@ class CardsDeck{
             let second = split[1];
             this.cards.push(new Card(first,second));
         }
-
         
     }
     
-
 }
 
 
@@ -233,35 +211,48 @@ let isGameOn = true;
 
 do {
 
-    gambler.drawCard(deck.getCards());
+    gambler.currentScore = 0;
 
+    do {
+        
+        if(game.getRound() > 1){
+            deck.createNewDeck();
+        }
+        gambler.drawCard(deck.getCards());
 
+        if(gambler.getCurrentScore() >= 18){
+            isGameOn = false;
+        }
 
-    if(gambler.getCurrentScore() >= 18){
-        isGameOn = false;
+    } while (isGameOn);
+    
+
+    let statusChanger = prompt("Enter 1 to advance round if you Won or to close if you Lost. Enter 2 to retire: ");
+    if(parseInt(statusChanger) === 2){
+        gambler.status = "Retired";
+        gambler.currentHand = [];
+    } else if(parseInt(statusChanger) === 1 && gambler.status != "Lost"){
+        gambler.status = "Active";
+        gambler.currentHand = [];
+        isGameOn = true;
     }
 
+    if(game.getRound() > 3){
+        gambler.status = "Retired";
+    }
 
-} while (isGameOn);
+    console.log(`Gambler Status: ${gambler.status}`);
 
-
-
-
-
-
-
+} while (gambler.status === "Active" || gambler.status === "Won");
 
 
-        
 
 
-    // gambler.setCurrentScore();
 
-    // deck.randomizeDeck();
 
-    // gambler.drawCard(deck.getCards());
-    
-    // console.log(gambler.currentHand);
+
+
+
 
 
 
